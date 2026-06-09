@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Frédéric Masi — technical GTM, telco & cloud-native, builder of private self-hosted AI</title>
+<meta name="description" content="Technical GTM and partner-ecosystem leader across telco, cloud-native, and open source. I build private, self-hosted AI agents — your data stays on your hardware.">
+<style>
+  :root{
+    --bg:#0d1117; --panel:#161b22; --line:#222a35; --ink:#e6edf3; --muted:#9aa7b4;
+    --accent:#4aa3ff; --accent-soft:#16324f;
+  }
+  *{box-sizing:border-box;}
+  html{background:var(--bg);}
+  body{
+    margin:0; color:var(--ink); background:var(--bg);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+    line-height:1.6; -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:760px; margin:0 auto; padding:72px 24px 96px;}
+  .eyebrow{color:var(--accent); font-weight:600; font-size:13px; letter-spacing:1.5px; text-transform:uppercase; margin:0 0 12px;}
+  h1{font-size:40px; line-height:1.1; margin:0 0 14px; letter-spacing:-0.5px;}
+  .tagline{font-size:19px; color:var(--ink); margin:0 0 22px; max-width:640px;}
+  .tagline b{color:var(--accent);}
+  .links{display:flex; flex-wrap:wrap; gap:10px; margin:0 0 40px;}
+  .links a{
+    color:var(--ink); text-decoration:none; font-size:14px; font-weight:500;
+    border:1px solid var(--line); border-radius:999px; padding:7px 15px; background:var(--panel);
+    transition:border-color .15s, color .15s;
+  }
+  .links a:hover{border-color:var(--accent); color:var(--accent);}
+  .about{color:var(--muted); font-size:15.5px; max-width:660px; margin:0 0 52px;}
+  .about b{color:var(--ink); font-weight:600;}
+  h2{font-size:13px; letter-spacing:1.5px; text-transform:uppercase; color:var(--muted); margin:0 0 18px; font-weight:600;}
+  .grid{display:grid; gap:14px;}
+  .card{
+    display:block; text-decoration:none; color:inherit; background:var(--panel);
+    border:1px solid var(--line); border-radius:12px; padding:20px 22px;
+    transition:border-color .15s, transform .15s, background .15s;
+  }
+  .card:hover{border-color:var(--accent); transform:translateY(-2px); background:#1a2230;}
+  .card .name{font-size:18px; font-weight:700; margin:0 0 5px;}
+  .card .name .arrow{color:var(--accent); font-weight:600;}
+  .card .desc{color:var(--muted); font-size:14.5px; margin:0;}
+  .card .tags{margin-top:10px; font-size:12px; color:var(--accent); letter-spacing:.3px;}
+  footer{margin-top:64px; padding-top:24px; border-top:1px solid var(--line); color:var(--muted); font-size:13.5px;}
+  footer a{color:var(--muted); text-decoration:none;}
+  footer a:hover{color:var(--accent);}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <p class="eyebrow">Frédéric Masi · London, UK</p>
+  <h1>I turn hard technology into adoption.</h1>
+  <p class="tagline">Technical GTM and partner-ecosystem leader across telco, cloud-native, and open source. On the side, I build <b>private, self-hosted AI agents</b> — where your data stays on your own hardware.</p>
+
+  <div class="links">
+    <a href="https://www.linkedin.com/in/fmasi">LinkedIn</a>
+    <a href="https://github.com/fmasi">GitHub</a>
+    <a href="mailto:email@fmasi.eu">Email</a>
+  </div>
+
+  <p class="about">15+ years across <b>Red Hat, Ericsson, Canonical, and Wind River</b> — partner ecosystems, solution-engineering enablement, and developer- and partner-facing programmes that drive real adoption of complex platforms (Kubernetes, OpenStack, telco cloud, 5G/O-RAN). I built and ran Wind River's <b>Ready for Wind River</b> partner certification and validation programme. Lately I've been building hands-on with AI: retrieval, on-device models, and agentic tooling.</p>
+
+  <h2>Things I've built</h2>
+  <div class="grid">
+
+    <a class="card" href="https://fmasi.github.io/mailrag/">
+      <p class="name">mailrag <span class="arrow">→</span></p>
+      <p class="desc">Private, self-hosted email RAG. Turn your own mail archive into a queryable knowledge base on your hardware — hybrid retrieval, thread-aware answers, optional local-LLM cleanup.</p>
+      <p class="tags">Python · LlamaIndex · Qdrant · open source</p>
+    </a>
+
+    <a class="card" href="https://fmasi.github.io/parley/">
+      <p class="name">Parley <span class="arrow">→</span></p>
+      <p class="desc">Private, fully on-device meeting transcription for Apple Silicon. Dual-stream mic and system capture, speaker diarization, echo removal, crash-safe — zero cloud.</p>
+      <p class="tags">Swift · on-device ML · open models · open source</p>
+    </a>
+
+    <a class="card" href="https://fmasi.github.io/cycling-analysis-agent/">
+      <p class="name">cycling-analysis-agent <span class="arrow">→</span></p>
+      <p class="desc">An AI cycling coach you host yourself. Reads your rides, predicts your routes, tracks your form, and verifies every climb against 1-metre LIDAR. A Claude agent with a directeur sportif's attitude.</p>
+      <p class="tags">Python · agentic AI · self-hosted · open source</p>
+    </a>
+
+  </div>
+
+  <footer>
+    Private, self-hosted AI — your data stays on your hardware.
+    &nbsp;·&nbsp; <a href="https://github.com/fmasi">github.com/fmasi</a>
+    &nbsp;·&nbsp; <a href="https://www.linkedin.com/in/fmasi">linkedin.com/in/fmasi</a>
+  </footer>
+
+</div>
+</body>
+</html>
