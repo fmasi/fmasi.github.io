@@ -3,12 +3,21 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
 <title>Frédéric Masi — technical GTM, telco & cloud-native, builder of private self-hosted AI</title>
 <meta name="description" content="Technical GTM and partner-ecosystem leader across telco, cloud-native, and open source. I build private, self-hosted AI agents — your data stays on your hardware.">
 <style>
   :root{
-    --bg:#0d1117; --panel:#161b22; --line:#222a35; --ink:#e6edf3; --muted:#9aa7b4;
-    --accent:#4aa3ff; --accent-soft:#16324f;
+    /* light (default) — bright, cohesive with the blog */
+    --bg:#fcfcfe; --panel:#ffffff; --line:#e6e8ec; --ink:#111827; --muted:#5b6573;
+    --accent:#2f6fed; --accent-soft:#eaf1ff; --card-hover:#f4f7fb;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      /* dark — soft slate, NOT pure black; tuned for readability */
+      --bg:#181c24; --panel:#212732; --line:#2c3442; --ink:#e8edf3; --muted:#aab6c2;
+      --accent:#5cb0ff; --accent-soft:#16324f; --card-hover:#262e3b;
+    }
   }
   *{box-sizing:border-box;}
   html{background:var(--bg);}
@@ -38,7 +47,7 @@
     border:1px solid var(--line); border-radius:12px; padding:20px 22px;
     transition:border-color .15s, transform .15s, background .15s;
   }
-  .card:hover{border-color:var(--accent); transform:translateY(-2px); background:#1a2230;}
+  .card:hover{border-color:var(--accent); transform:translateY(-2px); background:var(--card-hover);}
   .card .name{font-size:18px; font-weight:700; margin:0 0 5px;}
   .card .name .arrow{color:var(--accent); font-weight:600;}
   .card .desc{color:var(--muted); font-size:14.5px; margin:0;}
