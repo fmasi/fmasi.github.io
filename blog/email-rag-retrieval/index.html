@@ -1,0 +1,185 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Two techniques doubled my email search — and neither was a fancier model</title>
+<!-- Link-preview / social cards. Absolute URLs so previews render when shared. -->
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://fmasi.eu/blog/email-rag-retrieval/">
+<meta property="og:title" content="Two techniques doubled my email search — and neither was a fancier model">
+<meta property="og:description" content="I measured every technique on 360 real email questions. Recall went 46% → 93% — and the biggest wins weren't a fancier model.">
+<meta property="og:image" content="https://fmasi.eu/blog/email-rag-retrieval/card-hero.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Two techniques doubled my email search — and neither was a fancier model">
+<meta name="twitter:description" content="I measured every technique on 360 real email questions. Recall went 46% → 93% — and the biggest wins weren't a fancier model.">
+<meta name="twitter:image" content="https://fmasi.eu/blog/email-rag-retrieval/card-hero.png">
+<style>
+:root{--ink:#111827;--body:#1f2933;--muted:#6b7280;--accent:#7c3aed;--bg:#fcfcfe;--line:#e5e7eb;
+  --dense:#94a3b8;--sparse:#3b82f6;--summary:#7c3aed;--rerank:#f59e0b;--thread:#10b981;}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--body);font:17px/1.68 -apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;}
+.wrap{max-width:760px;margin:0 auto;padding:40px 24px 140px;}
+.hero{max-width:980px}
+.kicker{color:var(--accent);font-weight:700;letter-spacing:.07em;text-transform:uppercase;font-size:.78rem;margin:0}
+h1{font-size:2.1rem;line-height:1.12;margin:.25em 0 .35em;letter-spacing:-.01em;color:var(--ink)}
+h2{font-size:1.5rem;margin:2em 0 .4em;color:var(--ink);letter-spacing:-.01em}
+h3{font-size:1.16rem;margin:1.7em 0 .3em;color:var(--ink)}
+.dek{font-size:1.18rem;color:var(--muted);margin:.2em 0 1.4em;line-height:1.5}
+p{margin:.85em 0}
+.tldr{background:#f5f3ff;border:1px solid #ddd6fe;border-radius:14px;padding:18px 22px;margin:26px 0;font-size:1rem}
+.tldr b{color:#5b21b6}
+blockquote{margin:1.2em 0;padding:.5em 1.1em;border-left:4px solid var(--accent);background:#faf9ff;color:#4c1d95;border-radius:0 10px 10px 0;font-size:1.05rem}
+.term{background:#eef2ff;border-bottom:1px dashed #a5b4fc;padding:0 2px;border-radius:3px}
+table{border-collapse:collapse;width:100%;margin:1.1em 0;font-size:.92rem}
+th,td{border:1px solid var(--line);padding:7px 11px;text-align:center}
+th:first-child,td:first-child{text-align:left}
+th{background:#f3f0fe}
+tr.win td{background:#f0fdf4;font-weight:700}
+.up{color:#059669;font-weight:700}.down{color:#dc2626;font-weight:700}
+code{background:#eef1f4;padding:.1em .4em;border-radius:5px;font-size:.86em}
+.tip{background:#fffbeb;border:1px solid #fde68a;border-radius:12px;padding:16px 20px;margin:1.4em 0}
+.tip b{color:#92400e}
+.meta{font-size:.86rem;color:var(--muted)}
+hr{border:none;border-top:1px solid var(--line);margin:2.6em 0}
+/* hero graphic */
+.flow{display:flex;align-items:stretch;gap:6px;flex-wrap:wrap;margin-top:8px}
+.step{flex:1;min-width:138px;border-radius:13px;padding:14px 12px;color:#fff;display:flex;flex-direction:column}
+.step.peak{box-shadow:0 0 0 4px #a7f3d0}
+.step .t{font-size:.7rem;font-weight:800;text-transform:uppercase;letter-spacing:.02em;opacity:.97}
+.step .v{font-size:2rem;font-weight:800;margin:2px 0 0;line-height:1}
+.step .g{font-size:.72rem;font-weight:700;opacity:.95}
+.step .d{font-size:.78rem;line-height:1.28;opacity:.96;margin-top:7px;border-top:1px solid rgba(255,255,255,.3);padding-top:6px}
+.arrow{display:flex;align-items:center;color:#cbd5e1;font-size:1.5rem;font-weight:900}
+.foot{font-size:.8rem;color:var(--muted);margin-top:11px}.foot b{color:#065f46}
+.lead{background:#fff;border:1px solid var(--line);border-radius:16px;padding:22px 24px;margin-top:30px}
+.lead h3{margin:0 0 2px}.lead .sub{color:var(--muted);font-size:.9rem;margin:0 0 16px}
+.lead .row{display:flex;align-items:center;gap:13px;margin:10px 0}
+.lead .name{width:185px;font-size:.85rem;text-align:right;color:#374151;font-weight:600}
+.lead .bar{height:28px;border-radius:6px;display:flex;align-items:center;justify-content:flex-end;color:#fff;font-weight:800;font-size:.82rem;padding-right:9px;min-width:40px}
+.cap{font-size:.78rem;color:var(--muted);margin-top:11px}
+</style></head>
+<body><div class="wrap">
+
+<!-- ===================== HERO (the 30-second payload) ===================== -->
+<div class="hero">
+<p class="kicker">Building email search that actually finds the answer · part 1: retrieval</p>
+<h1>Two techniques doubled my email search — and neither was a fancier model</h1>
+<p class="dek">I rebuilt email search from scratch and measured every technique on 360 real questions. Recall went from <b>46% to 93%</b> — and the two biggest wins weren’t a fancier model. (I also used NVIDIA’s general-purpose stack as a yardstick — more on that below.)</p>
+
+<div class="flow">
+ <div class="step" style="background:var(--dense)"><div class="t">plain dense</div><div class="v">45.6%</div><div class="g">the baseline</div><div class="d">Match emails by meaning.</div></div>
+ <div class="arrow">▶</div>
+ <div class="step" style="background:var(--sparse)"><div class="t">+ learned sparse</div><div class="v">48.9%</div><div class="g">+3.3</div><div class="d">Also match your exact jargon — codenames, IDs, SKUs.</div></div>
+ <div class="arrow">▶</div>
+ <div class="step" style="background:var(--summary)"><div class="t">+ contextual summary</div><div class="v">61.7%</div><div class="g">+12.8</div><div class="d">Give terse replies their topic &amp; context first.</div></div>
+ <div class="arrow">▶</div>
+ <div class="step" style="background:var(--rerank)"><div class="t">+ reranking</div><div class="v">64.2%</div><div class="g">+2.5</div><div class="d">A smarter second pass re-scores the top hits.</div></div>
+ <div class="arrow">▶</div>
+ <div class="step peak" style="background:var(--thread)"><div class="t">+ thread reconstruction</div><div class="v">93.3%</div><div class="g">the leap ★</div><div class="d">Find the whole conversation, not one email.</div></div>
+</div>
+<p class="foot">★ The final step changes the question from “find the exact email” to <b>“find its conversation”</b> — a different, easier (and more useful) measure. Detail and caveats below.</p>
+
+<div class="lead">
+ <h3>The surprise: what actually moved the needle</h3>
+ <p class="sub">Ranked by how much each technique added. The fancy embedding model barely matters — <b>understanding the conversation does.</b></p>
+ <div class="row"><div class="name">thread reconstruction</div><div class="bar" style="width:340px;background:var(--thread)">+29 ★</div></div>
+ <div class="row"><div class="name">contextual summary</div><div class="bar" style="width:150px;background:var(--summary)">+12.8</div></div>
+ <div class="row"><div class="name">learned sparse</div><div class="bar" style="width:39px;background:var(--sparse)">+3.3</div></div>
+ <div class="row"><div class="name">reranking</div><div class="bar" style="width:30px;background:var(--rerank)">+2.5</div></div>
+ <div class="row"><div class="name">which embedder you pick</div><div class="bar" style="width:12px;background:#cbd5e1;color:#374151">~0</div></div>
+ <p class="cap">Recall@5 points gained. ★ thread reconstruction measured as thread-recall — see methodology.</p>
+</div>
+</div>
+
+<!-- ===================== 1-MINUTE: the thesis ===================== -->
+<div class="tldr">
+<b>The one-minute version.</b> Email search usually means keyword matching, and it usually misses. Modern “meaning-based” search helps — but in my tests the embedding model you choose barely mattered. What mattered was <b>understanding the conversation</b>: writing a short context summary for each email before indexing it, and — the big one — not hunting for the single answer email at all, but finding its whole <b>thread</b> and reading it. Stack everything and the right answer is reachable <b>93% of the time, up from 46%</b>. Along the way I used NVIDIA’s hosted retrieval stack as a yardstick — it’s a strong <b>general-purpose</b> retriever, built for broad search and not tuned for email — and the takeaway isn’t “who won.” It’s that an <b>email-specialised recipe does better on email</b>, while NVIDIA’s stack does better on the broad document-search task it’s actually built for. Task-fit, not brand.
+</div>
+
+<h2>What we’re measuring (and the one number to know)</h2>
+<p>Everything below is scored one way: you ask a question, the system returns a ranked list of emails, and we check whether the <em>right</em> one is near the top. The headline metric is <span class="term">recall@5</span> — <b>how often the correct email lands in the top 5 results.</b> 46% means “right answer in the top 5, just under half the time.” 93% means “almost always.”</p>
+<p class="meta">The test set: 360 real questions over a work mailbox, each with a known correct answer email. I also re-ran the whole thing on a public dataset (Enron emails) to make sure it wasn’t a quirk of my inbox — same result. Details at the end.</p>
+
+<hr>
+
+<!-- ===================== 10-MINUTE: the techniques ===================== -->
+<h2>The build-up, one technique at a time</h2>
+
+<h3>1 · Dense embeddings — search by meaning (45.6%)</h3>
+<p>The modern starting point. An <span class="term">embedding</span> turns a piece of text into a long list of numbers — a “vector” — that captures its <em>meaning</em>. Two emails about the same thing land near each other, even if they use different words. We call this <span class="term">dense</span> search because every number in the vector carries a little signal. Ask a question, embed it, return the nearest emails.</p>
+<p>It’s good, and it’s the floor we build on. Its weakness: by capturing the gist, it <em>blurs the specifics</em> — a dozen emails about “contract terminations” look almost identical, so the one you want doesn’t stand out.</p>
+
+<h3>2 · Learned sparse — match your exact words (48.9%, <span class="up">+3.3</span>)</h3>
+<p><span class="term">Sparse</span> search is the opposite idea: match the <em>actual words</em>. Old-school keyword search (think Ctrl-F or classic BM25) is sparse but dumb — it weights words by raw frequency. <span class="term">Learned sparse</span> is smarter: the model learned which words carry signal, so it locks onto the rare, high-value tokens — your project codenames, product SKUs, ticket numbers, acronyms — that a meaning-vector smears together. (One honest note: the model is pre-trained, not trained on <em>your</em> mailbox; it’s good at your jargon because jargon is rare and specific, exactly what exact-matching is for.)</p>
+<p>Run dense and learned-sparse together and you get <span class="term">hybrid</span> search — the best of both: meaning <em>and</em> exact terms. On its own the bump is modest (<span class="up">+3.3</span>), but it’s the difference-maker on jargon-heavy questions, and it stacks.</p>
+
+<h3>3 · Contextual summaries — give terse emails something to match (61.7%, <span class="up">+12.8</span>)</h3>
+<p>The biggest single embedding-side win, and an easy one to miss. Half of email is context-free fragments: “Approved, go ahead.” “See attached.” “+1.” There’s nothing in that text to search — the meaning lives in the <em>thread around it</em>. So before indexing each email, we prepend a one-line summary that restores its topic and context (a fictional example: “Re: Project Falcon budget — finance signs off the extra hardware spend”). Now the terse reply has something to match.</p>
+<p>This single move added <b><span class="up">+12.8</span></b> recall points — bigger than the embedder and reranker choices combined. It’s the first sign of the post’s real lesson: the wins are in <em>understanding the conversation</em>.</p>
+
+<h3>4 · Reranking — a smarter second opinion (64.2%, <span class="up">+2.5</span>)</h3>
+<p>Retrieval is fast but rough. A <span class="term">reranker</span> is a slower, smarter model that takes the top ~20 candidates and re-reads each one <em>together with</em> the question, scoring how well it actually answers. You only run it on the shortlist, so the cost is contained.</p>
+<p>It sharpens the top of the list (<span class="up">+2.5</span>) — but with a twist worth knowing: a reranker judges each email on its <em>own</em>, so for questions that need piecing together several emails (“what’s the current status, including the agreed changes?”) it can actually <span class="down">demote</span> the right answer, because no single email looks like the whole answer. Which sets up the last step.</p>
+
+<h3>5 · Thread reconstruction — stop hunting the email, find the conversation (93.3%)</h3>
+<blockquote style="font-size:1.3rem;font-weight:600;border-left-width:5px">Stop searching for the email. Find the conversation.</blockquote>
+<p>The leap. Every technique so far chases the one perfect email. But you almost never need <em>the</em> email — you need the <em>conversation</em> it’s in. <span class="term">Thread reconstruction</span> flips the goal: retrieve <em>any</em> email from the relevant thread, then pull in the whole reply chain and read it.</p>
+<p>Why it’s huge: finding the exact email is hard (61.7% of the time), but finding <em>some</em> email in the right conversation is easy (89%+), and the conversation contains the answer. You trade “find the needle” for “find the right haystack-section” — a far easier target — and it rescues exactly the multi-email questions reranking struggled with.</p>
+<blockquote>Reranking helps you find the right email. Thread reconstruction means you don’t have to.</blockquote>
+
+<h2>So what actually mattered?</h2>
+<p>Step back and rank the techniques by how much each added (the chart up top). The result genuinely surprised me: <b>the choice of embedding model — the thing everyone obsesses over — barely moved the needle.</b> The two biggest levers were both about <em>understanding the conversation</em>: reconstructing the thread (active, at search time) and contextual summaries (passive, baked into the index). Together they dwarf everything else.</p>
+<blockquote>The wins are in understanding the conversation, not in picking a fancier embedding model.</blockquote>
+
+<hr>
+
+<!-- ===================== the NVIDIA contrast (money shot) ===================== -->
+<h2>A yardstick: general-purpose vs email-specialised</h2>
+<p>Since I’d built the system to be <em>backend-agnostic</em> (swap the search models by config), I could run a clean side-by-side: my email-tuned, local <b>bge-m3 hybrid</b> against <b>NVIDIA’s hosted retrieval stack</b> (their NeMo Retriever embedding service plus their reranking service). Same questions, same everything else.</p>
+<p>A fair note up front: NVIDIA’s stack is a <b>general-purpose</b> retriever — designed to search any documents well, not tuned for email. It’s a strong yardstick precisely because it’s good at the general job. So the question isn’t “is mine better” — it’s “how much does specialising for email buy you?” On email questions, the email-specialised hybrid does measurably better — even without a reranker:</p>
+<table>
+<tr><th>setup</th><th>recall@5</th></tr>
+<tr class="win"><td>bge-m3 hybrid (mine, no rerank)</td><td>61.7</td></tr>
+<tr><td>NVIDIA dense + rerank</td><td>56.7</td></tr>
+<tr><td>NVIDIA dense</td><td>51.9</td></tr>
+</table>
+<p>I double-checked on public Enron-QA (360 more questions, independent data) — same ordering. So it’s not my mailbox.</p>
+
+<h3>The confirmation: on the job it’s built for, NVIDIA’s stack pulls ahead</h3>
+<p>Here’s the part that makes the point. I ran the <em>identical</em> comparison on the kind of task a general retriever is actually designed for: <b>legal e-discovery</b> (the public TREC Legal benchmark — “find every document relating to topic X,” judged by real lawyers). The order flips, and NVIDIA’s stack pulls clearly ahead:</p>
+<table>
+<tr><th>setup</th><th>P@10 (e-discovery)</th></tr>
+<tr class="win"><td>NVIDIA dense + rerank</td><td>0.50</td></tr>
+<tr><td>NVIDIA dense</td><td>0.37</td></tr>
+<tr><td>bge-m3 hybrid + rerank (mine)</td><td>0.30</td></tr>
+<tr><td>bge-m3 hybrid (mine)</td><td>0.20</td></tr>
+</table>
+<p><b>Same systems, opposite results — because the task is different.</b> Email Q&amp;A is <em>pinpoint</em> — one specific email answers, often hinging on a specific name or ID, which is exactly where exact-term (sparse) matching shines. E-discovery is <em>broad</em> — hundreds of documents are relevant and you want them all, which is where semantic (dense) search plus a relevance reranker shines.</p>
+<blockquote>There is no universally best retrieval recipe. The right one depends on the shape of the question. For email: hybrid + understand the conversation. For broad document discovery: dense + rerank.</blockquote>
+
+<div class="tip"><b>If you build one of these, measure your chunks against the context window.</b> Every embedding model has a maximum input length, and if a chunk (plus any summary you prepend) is longer, the model <em>silently truncates it</em> — you lose the tail and never see an error. Limits vary wildly (one model I used caps at 512 tokens; another reads 8,192). Measure your real chunk lengths first, and use a fail-loud setting during testing so over-length chunks error instead of quietly losing content. Five minutes that saves a misleading benchmark.</div>
+
+<hr>
+
+<!-- ===================== 30-MINUTE: methodology ===================== -->
+<h2>Methodology &amp; honest caveats</h2>
+<p>For the readers who want to trust the numbers (you should always ask):</p>
+<ul>
+<li><b>The test.</b> 360 real questions over a work mailbox, each with a known correct answer email (a “hard label” — no subjective judging in the retrieval scores). Cross-checked on 360 public Enron-QA questions; same ordering.</li>
+<li><b>Fair comparison.</b> Both sides used the same vector size (1024) and the same single reranker, so the comparison isolates the <em>recipe</em>, not incidental advantages — and NVIDIA’s stack is general-purpose, used here as a reference, not as a system anyone tuned for email.</li>
+<li><b>The 93% is a different (easier) measure.</b> The cumulative climb up to 64.2% is “did we find the exact answer email.” The jump to 93.3% switches to “did we find the answer’s <em>thread</em>” — a legitimately easier target, but the honest framing of thread reconstruction: a thread is a bigger thing to hit, and that’s precisely the point (you read the conversation, not the needle). Whether the assembled thread leads to a <em>correct answer</em> is a separate measurement — one for a possible follow-up.</li>
+<li><b>The first two steps use a no-summary baseline</b> so each technique adds exactly one thing; the summary step is also where my “with-summary” production index begins (its numbers line up with the bake-off table). The contextual-summary lever was isolated by re-running the whole benchmark with summaries off — it was worth +11 to +15 recall points.</li>
+<li><b>E-discovery caveat.</b> The TREC contest is only 3 topics (low statistical power) and absolute scores are low (e-discovery is hard) — but the effect is large and reproduces NVIDIA’s own published direction.</li>
+<li><b>Reproducible.</b> The benchmark scripts are in the repo (<code>scripts/eval/</code>).</li>
+</ul>
+
+<hr>
+<p class="meta">Finding the right email is only half the job — the obvious next question is whether the system then <em>answers</em> correctly. That, and more, in the mailrag series — stay tuned, as time allows.</p>
+<p class="meta">Built with <a href="https://github.com/fmasi/mailrag" style="color:var(--accent);font-weight:600">mailrag</a> — a self-hosted, privacy-first RAG-over-email tool. Results above are on the author’s private work corpus plus public Enron data; numbers are real and measured.</p>
+
+<footer style="margin-top:48px;padding-top:20px;border-top:1px solid var(--line);font-size:.86rem;color:var(--muted)">
+  Built by Frédéric Masi — private, self-hosted AI tools. By humans, for agents.
+  &nbsp;·&nbsp; <a href="https://fmasi.eu" style="color:var(--muted);text-decoration:none">fmasi.eu</a>
+  &nbsp;·&nbsp; <a href="https://github.com/fmasi" style="color:var(--muted);text-decoration:none">GitHub</a>
+  &nbsp;·&nbsp; <a href="https://www.linkedin.com/in/fmasi" style="color:var(--muted);text-decoration:none">LinkedIn</a>
+</footer>
+
+</div></body></html>
