@@ -1,5 +1,6 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
 <title>Two techniques doubled my email search — and neither was a fancier model</title>
 <!-- Link-preview / social cards. Absolute URLs so previews render when shared. -->
 <meta property="og:type" content="article">
@@ -55,6 +56,21 @@ hr{border:none;border-top:1px solid var(--line);margin:2.6em 0}
 .lead .name{width:185px;font-size:.85rem;text-align:right;color:#374151;font-weight:600}
 .lead .bar{height:28px;border-radius:6px;display:flex;align-items:center;justify-content:flex-end;color:#fff;font-weight:800;font-size:.82rem;padding-right:9px;min-width:40px}
 .cap{font-size:.78rem;color:var(--muted);margin-top:11px}
+/* dark mode — placed last so these override the light component rules above */
+@media (prefers-color-scheme:dark){
+  :root{--ink:#f1f4f8;--body:#cdd5df;--muted:#9aa7b4;--accent:#a78bfa;--bg:#181c24;--line:#2c3442;}
+  .tldr{background:#1e2233;border-color:#3a2f5a}
+  .tldr b{color:#c4b5fd}
+  blockquote{background:#1f2430;color:#d6ccf5}
+  .term{background:#2a2f44;border-bottom-color:#6d5fb0}
+  th{background:#232838}
+  tr.win td{background:#15301f}
+  code{background:#232838}
+  .tip{background:#2a2515;border-color:#5c4a1e}
+  .tip b{color:#fcd34d}
+  .lead{background:#1e2233}
+  .lead .name{color:#cdd5df}
+  .foot b{color:#6ee7b7}}
 </style></head>
 <body><div class="wrap">
 
