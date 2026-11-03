@@ -112,7 +112,7 @@ hr{border:none;border-top:1px solid var(--line);margin:2.6em 0}
 
 <h2>What we’re measuring (and the one number to know)</h2>
 <p>Everything below is scored one way: you ask a question, the system returns a ranked list of emails, and we check whether the <em>right</em> one is near the top. The headline metric is <span class="term">recall@5</span> — <b>how often the correct email lands in the top 5 results.</b> 46% means “right answer in the top 5, just under half the time.” 93% means “almost always.”</p>
-<p class="meta">The test set: 360 real questions over a work mailbox, each with a known correct answer email. I also re-ran the whole thing on a public dataset (Enron emails) to make sure it wasn’t a quirk of my inbox — same result. Details at the end.</p>
+<p class="meta">The test set: 360 real questions over a work mailbox, each with a known correct answer email. I also checked the main results on a public dataset (Enron emails) to make sure they weren’t a quirk of my inbox. They held. Details at the end.</p>
 
 <hr>
 
@@ -133,12 +133,12 @@ hr{border:none;border-top:1px solid var(--line);margin:2.6em 0}
 
 <h3>4 · Reranking — a smarter second opinion (64.2%, <span class="up">+2.5</span>)</h3>
 <p>Retrieval is fast but rough. A <span class="term">reranker</span> is a slower, smarter model that takes the top ~20 candidates and re-reads each one <em>together with</em> the question, scoring how well it actually answers. You only run it on the shortlist, so the cost is contained.</p>
-<p>It sharpens the top of the list (<span class="up">+2.5</span>) — but with a twist worth knowing: a reranker judges each email on its <em>own</em>, so for questions that need piecing together several emails (“what’s the current status, including the agreed changes?”) it can actually <span class="down">demote</span> the right answer, because no single email looks like the whole answer. Which sets up the last step.</p>
+<p>It sharpens the top of the list (<span class="up">+2.5</span>). On questions that need several emails pieced together (“what’s the current status, including the agreed changes?”) it changes nothing: those answers stay exactly where they were, because a reranker judges each email on its <em>own</em> and no single email looks like the whole answer. Which sets up the last step.</p>
 
 <h3>5 · Thread reconstruction — stop hunting the email, find the conversation (93.3%)</h3>
 <blockquote style="font-size:1.3rem;font-weight:600;border-left-width:5px">Stop searching for the email. Find the conversation.</blockquote>
 <p>The leap. Every technique so far chases the one perfect email. But you almost never need <em>the</em> email — you need the <em>conversation</em> it’s in. <span class="term">Thread reconstruction</span> flips the goal: retrieve <em>any</em> email from the relevant thread, then pull in the whole reply chain and read it.</p>
-<p>Why it’s huge: finding the exact email is hard (61.7% of the time), but finding <em>some</em> email in the right conversation is easy (89%+), and the conversation contains the answer. You trade “find the needle” for “find the right haystack-section” — a far easier target — and it rescues exactly the multi-email questions reranking struggled with.</p>
+<p>Why it’s huge: finding the exact email is hard (64.2% even with every trick so far), but finding <em>some</em> email in the right conversation is much easier, and the conversation contains the answer. You trade “find the needle” for “find the right haystack-section”, a far easier target, and it rescues the multi-email questions that no single email answers.</p>
 <blockquote>Reranking helps you find the right email. Thread reconstruction means you don’t have to.</blockquote>
 
 <h2>So what actually mattered?</h2>
@@ -157,7 +157,7 @@ hr{border:none;border-top:1px solid var(--line);margin:2.6em 0}
 <tr><td>NVIDIA dense + rerank</td><td>56.7</td></tr>
 <tr><td>NVIDIA dense</td><td>51.9</td></tr>
 </table>
-<p>I double-checked on public Enron-QA (360 more questions, independent data) — same ordering. So it’s not my mailbox.</p>
+<p>One caveat on this table and the e-discovery one below: they come from runs I made in June, and the collections behind them have since been deleted, so I can’t re-check them today. Treat them as indicative until I rebuild them.</p>
 
 <h3>The confirmation: on the job it’s built for, NVIDIA’s stack pulls ahead</h3>
 <p>Here’s the part that makes the point. I ran the <em>identical</em> comparison on the kind of task a general retriever is actually designed for: <b>legal e-discovery</b> (the public TREC Legal benchmark — “find every document relating to topic X,” judged by real lawyers). The order flips, and NVIDIA’s stack pulls clearly ahead:</p>
@@ -179,10 +179,10 @@ hr{border:none;border-top:1px solid var(--line);margin:2.6em 0}
 <h2>Methodology &amp; honest caveats</h2>
 <p>For the readers who want to trust the numbers (you should always ask):</p>
 <ul>
-<li><b>The test.</b> 360 real questions over a work mailbox, each with a known correct answer email (a “hard label” — no subjective judging in the retrieval scores). Cross-checked on 360 public Enron-QA questions; same ordering.</li>
+<li><b>The test.</b> 360 real questions over a work mailbox, each with a known correct answer email (a “hard label” — no subjective judging in the retrieval scores). The dense-versus-hybrid result was re-checked on 360 public Enron-QA questions, with the same ordering.</li>
 <li><b>Fair comparison.</b> Both sides used the same vector size (1024) and the same single reranker, so the comparison isolates the <em>recipe</em>, not incidental advantages — and NVIDIA’s stack is general-purpose, used here as a reference, not as a system anyone tuned for email.</li>
 <li><b>The 93% is a different (easier) measure.</b> The cumulative climb up to 64.2% is “did we find the exact answer email.” The jump to 93.3% switches to “did we find the answer’s <em>thread</em>” — a legitimately easier target, but the honest framing of thread reconstruction: a thread is a bigger thing to hit, and that’s precisely the point (you read the conversation, not the needle). Whether the assembled thread leads to a <em>correct answer</em> is a separate measurement — one for a possible follow-up.</li>
-<li><b>The first two steps use a no-summary baseline</b> so each technique adds exactly one thing; the summary step is also where my “with-summary” production index begins (its numbers line up with the bake-off table). The contextual-summary lever was isolated by re-running the whole benchmark with summaries off — it was worth +11 to +15 recall points.</li>
+<li><b>The first two steps use a no-summary baseline</b> so each technique adds exactly one thing; the summary step is also where my “with-summary” production index begins (its numbers line up with the bake-off table). The contextual-summary lever was isolated by re-running the whole benchmark with summaries off — it was worth +12.8 recall points.</li>
 <li><b>E-discovery caveat.</b> The TREC contest is only 3 topics (low statistical power) and absolute scores are low (e-discovery is hard) — but the effect is large and reproduces NVIDIA’s own published direction.</li>
 <li><b>Reproducible.</b> The benchmark scripts are in the repo (<code>scripts/eval/</code>).</li>
 </ul>
